@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -o errexit
+# set -o xtrace
+
+if ! [ -x "$(command -v raft)" ]; then
+    printf "%s\n" 'Error: raft is not installed.' >&2
+    exit 1
+fi
+
+raft "$@"

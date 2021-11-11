@@ -44,7 +44,7 @@ class Vote:
         self.msgID = msgID
 
     def __str__(self) -> str:
-        return f"seq:{self.seq}, pid: {self.pid}, msgID: {self.msgID}"
+        return f"seq :{self.seq}, pid: {self.pid}, msgID: {self.msgID}"
 
 
 class VoterEventNewVote:
@@ -157,6 +157,7 @@ class TotalOrder:
     def __init__(
         self, src: str, members, multicaster: Multicaster, unicaster: Unicaster
     ) -> None:
+        self._lock = threading.Lock()
         self._src = src
         self._multicaster = multicaster
         self._unicaster = unicaster
@@ -171,12 +172,13 @@ class TotalOrder:
         self._multicaster.multicast(ask)
 
     def onAsk(self, msg: TotalOrderAskMsg):
-        proposalSeq = max(self._maxFinalSeq, self._maxProposalSeq) + 1
-        self._maxProposalSeq = proposalSeq
-        item = HoldQueueItem(msg.body, proposalSeq, msg.pid, False, msg.msgID)
-        self._holdQueue.push(item)
-        replyAsk = TotalOrderReplyAskMsg(self._src, proposalSeq, msg.msgID)
-        self._multicaster.multicast(replyAsk)
+        with self._lock:
+            proposalSeq = max(self._maxFinalSeq, self._maxProposalSeq) + 1
+            self._maxProposalSeq = proposalSeq
+            item = HoldQueueItem(msg.body, proposalSeq, msg.pid, False, msg.msgID)
+            self._holdQueue.push(item)
+            replyAsk = TotalOrderReplyAskMsg(self._src, proposalSeq, msg.msgID)
+            self._multicaster.multicast(replyAsk)
 
     def onReplyAsk(self, msg: TotalOrderReplyAskMsg):
         self._voter.vote(msg.seq, msg.pid, msg.msgID)

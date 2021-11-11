@@ -22,6 +22,7 @@ setup(
             "mp0c = mp0.client:main",
             "mp0s = mp0.server:main",
             "mp1 = mp1.main:main",
+            "raft = mp2.main:main"
         ]
     },
 )
