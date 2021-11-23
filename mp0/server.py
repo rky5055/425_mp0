@@ -30,8 +30,8 @@ def main() -> NoReturn:
         s.bind((host, port))
         s.listen()
         while True:
-                conn, addr = s.accept()
-                threading.Thread(target=handler, args=(conn,)).start()
+            conn, addr = s.accept()
+            threading.Thread(target=handler, args=(conn,)).start()
 
 
 if __name__ == "__main__":

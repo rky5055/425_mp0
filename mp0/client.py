@@ -27,5 +27,6 @@ def main() -> NoReturn:
             s.send(payload.encode())
             s.send(b"\n")
 
+
 if __name__ == "__main__":
     pass
